@@ -8,15 +8,17 @@ var tau = Math.PI * 2;
 
 var draw = function () {
     context.save();
+    context.clearRect(0, 0, width, height);
     context.translate(halfWidth, halfHeight);
     particleList.forEach(particleLoop);
     context.restore();
 };
 
 var particleLoop = function(particle){
+    particle.update();
     circle(
-        particle.x,
-        particle.y,
+        particle.xPos,
+        particle.yPos,
         5,
         particle.hue,
         particle.sat
@@ -42,19 +44,31 @@ var getHslStringFromNormalizedValues = function(h, s, l){
 var Particle = function(seed){
     this.seed = seed;
     this.rng = new RNG(this.seed);
-    this.x = this.rng.nextRange(-halfWidth, halfWidth);
-    this.y = this.rng.nextRange(-halfHeight, halfHeight);
+    this.xPos = this.rng.nextRange(-halfWidth, halfWidth);
+    this.yPos = this.rng.nextRange(-halfHeight, halfHeight);
     this.hue = this.rng.nextFloat();
     this.sat = this.rng.nextFloat();
+    this.xVel = this.rng.nextFloat() - 0.5;
+    this.yVel = this.rng.nextFloat() - 0.5;
+};
+Particle.prototype = {
+    update: function(){
+        this.xPos += this.xVel;
+        this.yPos += this.yVel;
+    }
 };
 
 var particleList = [];
-var a = 1000;
+var a = 100;
 var particleSeedRng = new RNG(2);
 while(a-- > 0){
     var extraRandomSeed = particleSeedRng.nextFloat() * 200000;
     var particleInstance = new Particle(extraRandomSeed);
     particleList.push(particleInstance);
 }
+var drawLoop = function(){
+    requestAnimationFrame(drawLoop);
+    draw();
+};
 
-draw();
+drawLoop();
