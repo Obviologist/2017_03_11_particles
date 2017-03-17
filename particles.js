@@ -41,11 +41,11 @@ var getHslStringFromNormalizedValues = function(h, s, l){
     return 'hsl(' + (h * 360) + ', ' + (s * 100) + '%, ' + (l * 100) + '%)';
 };
 
-var Particle = function(seed){
+var Particle = function(seed, startX, startY){
     this.seed = seed;
     this.rng = new RNG(this.seed);
-    this.xPos = this.rng.nextRange(-halfWidth, halfWidth);
-    this.yPos = this.rng.nextRange(-halfHeight, halfHeight);
+    this.xPos = startX;
+    this.yPos = startY;
     this.hue = this.rng.nextFloat();
     this.sat = this.rng.nextFloat();
     this.xVel = this.rng.nextFloat() - 0.5;
@@ -59,13 +59,25 @@ Particle.prototype = {
 };
 
 var particleList = [];
-var a = 100;
 var particleSeedRng = new RNG(2);
-while(a-- > 0){
-    var extraRandomSeed = particleSeedRng.nextFloat() * 200000;
-    var particleInstance = new Particle(extraRandomSeed);
-    particleList.push(particleInstance);
-}
+
+var makeFirework = function(x, y){
+    var numberOfParticles = particleSeedRng.nextRange(60, 120);
+    while(numberOfParticles-- > 0){
+        var extraRandomSeed = particleSeedRng.nextFloat() * 200000;
+        var particleInstance = new Particle(
+            extraRandomSeed,
+            x,
+            y
+        );
+        particleList.push(particleInstance);
+    }
+};
+
+makeFirework(0, 0);
+makeFirework(-halfWidth/2, 0);
+makeFirework(-halfWidth/2, halfWidth / 2);
+
 var drawLoop = function(){
     requestAnimationFrame(drawLoop);
     draw();
