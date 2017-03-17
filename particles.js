@@ -1,10 +1,10 @@
 var canvas = document.getElementById('particleCanvas');
 var context = canvas.getContext('2d');
-var width =  canvas.width;
-var height = canvas.height
+var width = canvas.width;
+var height = canvas.height;
 var halfWidth = width / 2;
 var halfHeight = height / 2;
-var tau = Math.PI*2;
+var tau = Math.PI * 2;
 
 var draw = function () {
     context.save();
@@ -13,37 +13,48 @@ var draw = function () {
     context.restore();
 };
 
-
-var particleLoop = function (particle){
+var particleLoop = function(particle){
     circle(
-        particle.position.x,
-        particle.position.y,
+        particle.x,
+        particle.y,
         5,
-        particle.hue
+        particle.hue,
+        particle.sat
     );
 };
 
-var circle = function(x, y, radius, hue){
+var circle = function(x, y, radius, hue, sat){
     context.beginPath();
     context.ellipse(x, y, radius, radius, 0, 0, tau, false);
     context.closePath();
-    context.fillStyle = 'hsl(' + (hue * 360) + ', 100%, 50%)';
+    context.fillStyle = getHslStringFromNormalizedValues(
+        hue,
+        sat,
+        0.5
+    );
     context.fill();
 };
 
-var Particle = function(seed){
-    this.rng = new RNG(seed);
-    this.position = {
-        x: this.rng.nextRange(-halfWidth, halfWidth),
-        y: this.rng.nextRange(-halfWidth, halfWidth)
-    };
-    this.hue =this.rng.nextFloat();
+var getHslStringFromNormalizedValues = function(h, s, l){
+    return 'hsl(' + (h * 360) + ', ' + (s * 100) + '%, ' + (l * 100) + '%)';
 };
 
-var particleList = [
-    new Particle(1),
-    new Particle(2),
-    new Particle(3)
-];
+var Particle = function(seed){
+    this.seed = seed;
+    this.rng = new RNG(this.seed);
+    this.x = this.rng.nextRange(-halfWidth, halfWidth);
+    this.y = this.rng.nextRange(-halfHeight, halfHeight);
+    this.hue = this.rng.nextFloat();
+    this.sat = this.rng.nextFloat();
+};
+
+var particleList = [];
+var a = 1000;
+var particleSeedRng = new RNG(2);
+while(a-- > 0){
+    var extraRandomSeed = particleSeedRng.nextFloat() * 200000;
+    var particleInstance = new Particle(extraRandomSeed);
+    particleList.push(particleInstance);
+}
 
 draw();
