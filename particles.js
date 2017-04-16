@@ -16,13 +16,7 @@ var draw = function () {
 
 var particleLoop = function(particle){
     particle.update();
-    circle(
-        particle.xPos,
-        particle.yPos,
-        5,
-        particle.hue,
-        particle.sat
-    );
+    particle.render();
 };
 
 var circle = function(x, y, radius, hue, sat){
@@ -55,6 +49,15 @@ Particle.prototype = {
     update: function(){
         this.xPos += this.xVel;
         this.yPos += this.yVel;
+    },
+    render: function(){
+        circle(
+            this.xPos,
+            this.yPos,
+            5,
+            this.hue,
+            this.sat
+        );
     }
 };
 
@@ -74,9 +77,15 @@ var makeFirework = function(x, y){
     }
 };
 
-makeFirework(0, 0);
-makeFirework(-halfWidth/2, 0);
-makeFirework(-halfWidth/2, halfWidth / 2);
+var handleClick = function(event){
+    makeFirework(
+        event.clientX - halfWidth,
+        event.clientY - halfHeight
+    );
+};
+
+canvas.addEventListener('click', handleClick);
+
 
 var drawLoop = function(){
     requestAnimationFrame(drawLoop);
