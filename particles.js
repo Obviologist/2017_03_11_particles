@@ -23,20 +23,21 @@ var deadParticleFilter = function (particle) {
     return particle.alive;
 };
 
-var circle = function(x, y, radius, hue, sat){
+var circle = function(x, y, radius, hue, sat, alpha){
     context.beginPath();
     context.ellipse(x, y, radius, radius, 0, 0, tau, false);
     context.closePath();
-    context.fillStyle = getHslStringFromNormalizedValues(
+    context.fillStyle = getHslaStringFromNormalizedValues(
         hue,
         sat,
-        0.5
+        0.5,
+        alpha
     );
     context.fill();
 };
 
-var getHslStringFromNormalizedValues = function(h, s, l){
-    return 'hsl(' + (h * 360) + ', ' + (s * 100) + '%, ' + (l * 100) + '%)';
+var getHslaStringFromNormalizedValues = function(h, s, l, a){
+    return 'hsla(' + (h * 360) + ', ' + (s * 100) + '%, ' + (l * 100) + '%, ' + a + ')';
 };
 
 var Particle = function(seed, startX, startY){
@@ -51,14 +52,15 @@ var Particle = function(seed, startX, startY){
     this.xVel = Math.cos(angle) * speed;
     this.yVel = Math.sin(angle) * speed;
     this.lifespan = this.rng.nextRange(50, 200);
+    this.life = this.lifespan;
     this.alive = true;
 };
 Particle.prototype = {
     update: function(){
         this.xPos += this.xVel;
         this.yPos += this.yVel;
-        this.lifespan -= 1;
-        if(this.lifespan < 1){
+        this.life -= 1;
+        if(this.life < 1){
             this.alive = false;
         }
     },
@@ -68,7 +70,8 @@ Particle.prototype = {
             this.yPos,
             5,
             this.hue,
-            this.sat
+            this.sat,
+            this.life / this.lifespan
         );
     }
 };
