@@ -11,12 +11,16 @@ var draw = function () {
     context.clearRect(0, 0, width, height);
     context.translate(halfWidth, halfHeight);
     particleList.forEach(particleLoop);
+    particleList = particleList.filter(deadParticleFilter);
     context.restore();
 };
 
 var particleLoop = function(particle){
     particle.update();
     particle.render();
+};
+var deadParticleFilter = function (particle) {
+    return particle.alive;
 };
 
 var circle = function(x, y, radius, hue, sat){
@@ -46,11 +50,17 @@ var Particle = function(seed, startX, startY){
     var speed = 1 + this.rng.nextFloat();
     this.xVel = Math.cos(angle) * speed;
     this.yVel = Math.sin(angle) * speed;
+    this.lifespan = this.rng.nextRange(50, 200);
+    this.alive = true;
 };
 Particle.prototype = {
     update: function(){
         this.xPos += this.xVel;
         this.yPos += this.yVel;
+        this.lifespan -= 1;
+        if(this.lifespan < 1){
+            this.alive = false;
+        }
     },
     render: function(){
         circle(
