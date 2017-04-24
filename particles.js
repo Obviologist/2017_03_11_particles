@@ -42,8 +42,10 @@ var Particle = function(seed, startX, startY){
     this.yPos = startY;
     this.hue = this.rng.nextFloat();
     this.sat = this.rng.nextFloat();
-    this.xVel = this.rng.nextFloat() - 0.5;
-    this.yVel = this.rng.nextFloat() - 0.5;
+    var angle = this.rng.nextFloat() * tau;
+    var speed = 1 + this.rng.nextFloat();
+    this.xVel = Math.cos(angle) * speed;
+    this.yVel = Math.sin(angle) * speed;
 };
 Particle.prototype = {
     update: function(){
